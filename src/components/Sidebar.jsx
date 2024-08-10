@@ -4,11 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import usePages from '../hooks/usePages';
 
-const Sidebar = () => {
+const Sidebar = ({ onSelectPage }) => {
   const { pages, addPage } = usePages();
 
   const handleAddPage = () => {
-    addPage('New Page');
+    const newPage = addPage('New Page');
+    onSelectPage(newPage);
   };
 
   return (
@@ -27,7 +28,12 @@ const Sidebar = () => {
         <ul>
           {pages.map(page => (
             <li key={page.id} className="mb-2">
-              <a href="#" className="text-gray-700 hover:text-gray-900">{page.title}</a>
+              <button
+                onClick={() => onSelectPage(page)}
+                className="text-left w-full px-2 py-1 rounded hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                {page.title}
+              </button>
             </li>
           ))}
         </ul>

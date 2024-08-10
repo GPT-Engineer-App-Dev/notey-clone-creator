@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Placeholder from '@tiptap/extension-placeholder';
 import { Bold, Italic, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import usePages from '../hooks/usePages';
@@ -7,21 +10,40 @@ const Workspace = () => {
   const { pages, updatePage } = usePages();
   const [currentPage, setCurrentPage] = useState(pages[0]);
 
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Placeholder.configure({
+        placeholder: 'Start typing here...',
+      }),
+    ],
+    content: currentPage.content,
+    onUpdate: ({ editor }) => {
+      const newContent = editor.getHTML();
+      setCurrentPage(prev => ({ ...prev, content: newContent }));
+      updatePage(currentPage.id, currentPage.title, newContent);
+    },
+  });
+
   useEffect(() => {
     setCurrentPage(pages[0]);
   }, [pages]);
 
+  useEffect(() => {
+    if (editor && currentPage.content !== editor.getHTML()) {
+      editor.commands.setContent(currentPage.content);
+    }
+  }, [currentPage, editor]);
+
   const handleTitleChange = (e) => {
     const newTitle = e.target.value;
-    setCurrentPage({ ...currentPage, title: newTitle });
+    setCurrentPage(prev => ({ ...prev, title: newTitle }));
     updatePage(currentPage.id, newTitle, currentPage.content);
   };
 
-  const handleContentChange = (e) => {
-    const newContent = e.target.value;
-    setCurrentPage({ ...currentPage, content: newContent });
-    updatePage(currentPage.id, currentPage.title, newContent);
-  };
+  if (!editor) {
+    return null;
+  }
 
   return (
     <div className="flex-grow p-8">
@@ -34,22 +56,32 @@ const Workspace = () => {
         />
       </div>
       <div className="mb-4 flex space-x-2">
-        <Button variant="outline" size="icon">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => editor.chain().focus().toggleBold().run()}
+          className={editor.isActive('bold') ? 'is-active' : ''}
+        >
           <Bold className="h-4 w-4" />
         </Button>
-        <Button variant="outline" size="icon">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => editor.chain().focus().toggleItalic().run()}
+          className={editor.isActive('italic') ? 'is-active' : ''}
+        >
           <Italic className="h-4 w-4" />
         </Button>
-        <Button variant="outline" size="icon">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => editor.chain().focus().toggleBulletList().run()}
+          className={editor.isActive('bulletList') ? 'is-active' : ''}
+        >
           <List className="h-4 w-4" />
         </Button>
       </div>
-      <textarea
-        value={currentPage.content}
-        onChange={handleContentChange}
-        placeholder="Start typing here..."
-        className="w-full h-[calc(100vh-200px)] p-4 border rounded-md resize-none outline-none"
-      />
+      <EditorContent editor={editor} className="prose max-w-none" />
     </div>
   );
 };

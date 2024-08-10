@@ -2,8 +2,8 @@ import { useState } from 'react';
 
 const usePages = () => {
   const [pages, setPages] = useState([
-    { id: 1, title: 'Welcome Page', content: 'Welcome to your Notion clone!' },
-    { id: 2, title: 'Getting Started', content: 'Here are some tips to get started...' },
+    { id: 1, title: 'Welcome Page', content: '<p>Welcome to your Notion clone!</p>' },
+    { id: 2, title: 'Getting Started', content: '<p>Here are some tips to get started...</p>' },
   ]);
 
   const addPage = (title, content = '') => {
@@ -13,6 +13,7 @@ const usePages = () => {
       content,
     };
     setPages([...pages, newPage]);
+    return newPage;
   };
 
   const updatePage = (id, title, content) => {
