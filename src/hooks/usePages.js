@@ -15,12 +15,12 @@ const usePages = () => {
       content,
       parentId,
     };
-    setPages([...pages, newPage]);
+    setPages(prevPages => [...prevPages, newPage]);
     return newPage;
   };
 
   const updatePage = (id, title, content) => {
-    setPages(pages.map(page => 
+    setPages(prevPages => prevPages.map(page => 
       page.id === id ? { ...page, title, content } : page
     ));
   };
@@ -28,25 +28,25 @@ const usePages = () => {
   const deletePage = (id) => {
     const pageToDelete = pages.find(page => page.id === id);
     if (pageToDelete) {
-      setPages(pages.filter(page => page.id !== id && page.parentId !== id));
-      setTrashedPages([...trashedPages, { ...pageToDelete, deletedAt: new Date() }]);
+      setPages(prevPages => prevPages.filter(page => page.id !== id && page.parentId !== id));
+      setTrashedPages(prevTrashedPages => [...prevTrashedPages, { ...pageToDelete, deletedAt: new Date() }]);
     }
   };
 
   const restorePage = (id) => {
     const pageToRestore = trashedPages.find(page => page.id === id);
     if (pageToRestore) {
-      setTrashedPages(trashedPages.filter(page => page.id !== id));
-      setPages([...pages, { ...pageToRestore, deletedAt: undefined }]);
+      setTrashedPages(prevTrashedPages => prevTrashedPages.filter(page => page.id !== id));
+      setPages(prevPages => [...prevPages, { ...pageToRestore, deletedAt: undefined }]);
     }
   };
 
   const permanentlyDeletePage = (id) => {
-    setTrashedPages(trashedPages.filter(page => page.id !== id));
+    setTrashedPages(prevTrashedPages => prevTrashedPages.filter(page => page.id !== id));
   };
 
   const movePage = (id, newParentId) => {
-    setPages(pages.map(page =>
+    setPages(prevPages => prevPages.map(page =>
       page.id === id ? { ...page, parentId: newParentId } : page
     ));
   };

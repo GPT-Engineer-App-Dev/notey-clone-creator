@@ -5,7 +5,7 @@ import usePages from '../hooks/usePages';
 
 const Index = () => {
   const pagesContext = usePages();
-  const [currentPage, setCurrentPage] = useState(pagesContext.pages[0]);
+  const [currentPage, setCurrentPage] = useState(() => pagesContext.pages[0] || null);
   const [darkMode, setDarkMode] = useState(false);
 
   const handleSelectPage = (page) => {
@@ -13,7 +13,7 @@ const Index = () => {
   };
 
   const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
+    setDarkMode(prevMode => !prevMode);
   };
 
   useEffect(() => {
@@ -23,6 +23,10 @@ const Index = () => {
       document.documentElement.classList.remove('dark');
     }
   }, [darkMode]);
+
+  if (!currentPage) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className={`flex h-screen ${darkMode ? 'dark' : ''}`}>
