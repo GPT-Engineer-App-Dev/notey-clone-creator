@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
-import { Bold, Italic, List, Heading1, Heading2, Code } from 'lucide-react';
+import { Bold, Italic, List, Heading1, Heading2, Code, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import usePages from '../hooks/usePages';
 
-const Workspace = ({ currentPage, setCurrentPage, updatePage }) => {
+const Workspace = ({ currentPage, setCurrentPage, updatePage, addPage }) => {
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -34,19 +34,27 @@ const Workspace = ({ currentPage, setCurrentPage, updatePage }) => {
     updatePage(currentPage.id, newTitle, currentPage.content);
   };
 
+  const handleAddNestedPage = () => {
+    const newPage = addPage('New Nested Page', '', currentPage.id);
+    setCurrentPage(newPage);
+  };
+
   if (!editor) {
     return null;
   }
 
   return (
     <div className="flex-grow p-8 bg-white dark:bg-gray-900">
-      <div className="mb-4">
+      <div className="mb-4 flex items-center justify-between">
         <input
           type="text"
           value={currentPage.title}
           onChange={handleTitleChange}
           className="text-3xl font-bold w-full outline-none bg-transparent dark:text-white"
         />
+        <Button variant="outline" size="sm" onClick={handleAddNestedPage}>
+          <Plus className="h-4 w-4 mr-2" /> Add Nested Page
+        </Button>
       </div>
       <div className="mb-4 flex space-x-2">
         <Button

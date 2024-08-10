@@ -27,15 +27,15 @@ const Index = () => {
   return (
     <div className={`flex h-screen ${darkMode ? 'dark' : ''}`}>
       <Sidebar
-        {...pagesContext}
         onSelectPage={handleSelectPage}
         darkMode={darkMode}
         toggleDarkMode={toggleDarkMode}
       />
       <Workspace
-        {...pagesContext}
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
+        updatePage={pagesContext.updatePage}
+        addPage={pagesContext.addPage}
       />
     </div>
   );
