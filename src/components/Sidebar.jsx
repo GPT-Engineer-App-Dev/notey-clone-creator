@@ -97,7 +97,7 @@ const Sidebar = ({ onSelectPage, darkMode, toggleDarkMode }) => {
   return (
     <div className="w-64 h-full bg-gray-100 dark:bg-gray-800 p-4 flex flex-col">
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-xl font-bold dark:text-white">Notion Clone</h1>
+        <h1 className="text-xl font-bold dark:text-white">Lotion</h1>
         <Button variant="ghost" size="icon" onClick={toggleDarkMode}>
           {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
         </Button>
