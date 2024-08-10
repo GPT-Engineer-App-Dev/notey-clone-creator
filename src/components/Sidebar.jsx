@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { Plus, Search, Moon, Sun, ChevronRight, ChevronDown } from 'lucide-react';
+import { Plus, Search, Moon, Sun, ChevronRight, ChevronDown, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import usePages from '../hooks/usePages';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
-const PageItem = ({ page, onSelectPage, onToggle, isOpen, level = 0 }) => {
-  const childPages = usePages().pages.filter(p => p.parentId === page.id);
+const PageItem = ({ page, onSelectPage, onToggle, isOpen, level = 0, onDelete }) => {
+  const { pages } = usePages();
+  const childPages = pages.filter(p => p.parentId === page.id);
 
   return (
     <>
@@ -18,19 +19,24 @@ const PageItem = ({ page, onSelectPage, onToggle, isOpen, level = 0 }) => {
             {...provided.dragHandleProps}
             className="mb-1"
           >
-            <button
-              onClick={() => onSelectPage(page)}
-              className={`text-left w-full px-2 py-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white flex items-center ${
-                level > 0 ? 'ml-4' : ''
-              }`}
-            >
-              {childPages.length > 0 && (
-                <span onClick={(e) => { e.stopPropagation(); onToggle(page.id); }}>
-                  {isOpen ? <ChevronDown className="h-4 w-4 mr-1" /> : <ChevronRight className="h-4 w-4 mr-1" />}
-                </span>
-              )}
-              {page.title}
-            </button>
+            <div className="flex items-center">
+              <button
+                onClick={() => onSelectPage(page)}
+                className={`text-left w-full px-2 py-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white flex items-center ${
+                  level > 0 ? 'ml-4' : ''
+                }`}
+              >
+                {childPages.length > 0 && (
+                  <span onClick={(e) => { e.stopPropagation(); onToggle(page.id); }}>
+                    {isOpen ? <ChevronDown className="h-4 w-4 mr-1" /> : <ChevronRight className="h-4 w-4 mr-1" />}
+                  </span>
+                )}
+                {page.title}
+              </button>
+              <Button variant="ghost" size="icon" onClick={() => onDelete(page.id)}>
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
           </li>
         )}
       </Draggable>
@@ -46,6 +52,7 @@ const PageItem = ({ page, onSelectPage, onToggle, isOpen, level = 0 }) => {
                   onToggle={onToggle}
                   isOpen={isOpen}
                   level={level + 1}
+                  onDelete={onDelete}
                 />
               ))}
               {provided.placeholder}
@@ -58,9 +65,10 @@ const PageItem = ({ page, onSelectPage, onToggle, isOpen, level = 0 }) => {
 };
 
 const Sidebar = ({ onSelectPage, darkMode, toggleDarkMode }) => {
-  const { pages, addPage, movePage } = usePages();
+  const { pages, trashedPages, addPage, movePage, deletePage, restorePage, permanentlyDeletePage } = usePages();
   const [searchTerm, setSearchTerm] = useState('');
   const [openPages, setOpenPages] = useState({});
+  const [showTrash, setShowTrash] = useState(false);
 
   const handleAddPage = () => {
     const newPage = addPage('New Page');
@@ -119,6 +127,7 @@ const Sidebar = ({ onSelectPage, darkMode, toggleDarkMode }) => {
                     onSelectPage={onSelectPage}
                     onToggle={togglePage}
                     isOpen={openPages[page.id]}
+                    onDelete={deletePage}
                   />
                 ))}
                 {provided.placeholder}
@@ -127,6 +136,33 @@ const Sidebar = ({ onSelectPage, darkMode, toggleDarkMode }) => {
           )}
         </Droppable>
       </DragDropContext>
+      <div className="mt-4">
+        <Button
+          variant="ghost"
+          className="w-full justify-start"
+          onClick={() => setShowTrash(!showTrash)}
+        >
+          <Trash2 className="h-4 w-4 mr-2" />
+          Trash
+        </Button>
+        {showTrash && (
+          <ul className="mt-2">
+            {trashedPages.map(page => (
+              <li key={page.id} className="flex items-center justify-between py-1">
+                <span className="text-sm dark:text-white">{page.title}</span>
+                <div>
+                  <Button variant="ghost" size="sm" onClick={() => restorePage(page.id)}>
+                    Restore
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => permanentlyDeletePage(page.id)}>
+                    Delete
+                  </Button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 };

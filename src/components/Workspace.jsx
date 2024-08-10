@@ -28,6 +28,46 @@ const Workspace = ({ currentPage, setCurrentPage, updatePage, addPage }) => {
     }
   }, [currentPage, editor]);
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        switch (e.key) {
+          case 'b':
+            e.preventDefault();
+            editor.chain().focus().toggleBold().run();
+            break;
+          case 'i':
+            e.preventDefault();
+            editor.chain().focus().toggleItalic().run();
+            break;
+          case '1':
+            e.preventDefault();
+            editor.chain().focus().toggleHeading({ level: 1 }).run();
+            break;
+          case '2':
+            e.preventDefault();
+            editor.chain().focus().toggleHeading({ level: 2 }).run();
+            break;
+          case 'l':
+            e.preventDefault();
+            editor.chain().focus().toggleBulletList().run();
+            break;
+          case 'e':
+            e.preventDefault();
+            editor.chain().focus().toggleCodeBlock().run();
+            break;
+          default:
+            break;
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [editor]);
+
   const handleTitleChange = (e) => {
     const newTitle = e.target.value;
     setCurrentPage(prev => ({ ...prev, title: newTitle }));
@@ -62,6 +102,7 @@ const Workspace = ({ currentPage, setCurrentPage, updatePage, addPage }) => {
           size="icon"
           onClick={() => editor.chain().focus().toggleBold().run()}
           className={editor.isActive('bold') ? 'is-active' : ''}
+          title="Bold (Ctrl+B)"
         >
           <Bold className="h-4 w-4" />
         </Button>
@@ -70,6 +111,7 @@ const Workspace = ({ currentPage, setCurrentPage, updatePage, addPage }) => {
           size="icon"
           onClick={() => editor.chain().focus().toggleItalic().run()}
           className={editor.isActive('italic') ? 'is-active' : ''}
+          title="Italic (Ctrl+I)"
         >
           <Italic className="h-4 w-4" />
         </Button>
@@ -78,6 +120,7 @@ const Workspace = ({ currentPage, setCurrentPage, updatePage, addPage }) => {
           size="icon"
           onClick={() => editor.chain().focus().toggleBulletList().run()}
           className={editor.isActive('bulletList') ? 'is-active' : ''}
+          title="Bullet List (Ctrl+L)"
         >
           <List className="h-4 w-4" />
         </Button>
@@ -86,6 +129,7 @@ const Workspace = ({ currentPage, setCurrentPage, updatePage, addPage }) => {
           size="icon"
           onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
           className={editor.isActive('heading', { level: 1 }) ? 'is-active' : ''}
+          title="Heading 1 (Ctrl+1)"
         >
           <Heading1 className="h-4 w-4" />
         </Button>
@@ -94,6 +138,7 @@ const Workspace = ({ currentPage, setCurrentPage, updatePage, addPage }) => {
           size="icon"
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
           className={editor.isActive('heading', { level: 2 }) ? 'is-active' : ''}
+          title="Heading 2 (Ctrl+2)"
         >
           <Heading2 className="h-4 w-4" />
         </Button>
@@ -102,6 +147,7 @@ const Workspace = ({ currentPage, setCurrentPage, updatePage, addPage }) => {
           size="icon"
           onClick={() => editor.chain().focus().toggleCodeBlock().run()}
           className={editor.isActive('codeBlock') ? 'is-active' : ''}
+          title="Code Block (Ctrl+E)"
         >
           <Code className="h-4 w-4" />
         </Button>
